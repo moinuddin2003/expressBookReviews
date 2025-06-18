@@ -62,7 +62,27 @@ public_users.get('/author/:author',function (req, res) {
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
   //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+
+    const title = req.params.title;
+  const result = [];
+
+  for (let key in books) {
+    if (books[key].title === title) {
+      result.push({
+        id: key,
+        title: books[key].title,
+        AuthorName: books[key].author,
+        Reviews: books[key].reviews,
+      });
+    }
+  }
+
+  if (result.length > 0) {
+    return res.status(200).json({ Finding_by_Title: result });
+  } else {
+    return res.status(404).json({ message: "Title Not Found" });
+  }
+  // return res.status(300).json({message: "Yet to be implemented"});
 });
 
 //  Get book review
