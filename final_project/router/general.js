@@ -3,6 +3,7 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require("axios");
 
 // const doesExist = (username) => {
 //   let userswithsamename = users.filter((user) => {
@@ -31,12 +32,39 @@ public_users.post("/register", (req, res) => {
   // return res.status(300).json({message: "Yet to be implemented"});
 });
 
+public_users.get("/async" , async (req,res) =>
+{
+  try{
+    const response = await axios.get("http://localhost:5000/");
+    res.send(response.data);
+  }
+  catch(error)
+  {
+    res.status(500).send('Error Fetching Books')
+  }
+
+})
+
 // Get the book list available in the shop
 public_users.get("/", function (req, res) {
   //Write your code here
   return res.status(200).send(JSON.stringify({ books }, null, 5));
   // return res.status(300).json({message: "Yet to be implemented"});
 });
+
+public_users.get("/async/isbn/:isbn",async(req,res) =>
+{
+  const isbn = req.params.isbn;
+  try{
+  const response = await axios.get(`http://localhost:5000/isbn/${isbn}`)
+  res.send(response.data);
+  }
+  catch(err)
+  {
+    res.status(500).send('Error fetching book by ISBN')
+  }
+})
+
 
 // Get book details based on ISBN
 public_users.get("/isbn/:isbn", function (req, res) {
@@ -52,6 +80,19 @@ public_users.get("/isbn/:isbn", function (req, res) {
   }
   // return res.status(300).json({message: "Yet to be implemented"});
 });
+
+public_users.get("/async/author/:author" , async(req,res) =>
+{
+  const author = req.params.author;
+  try{
+    const response = axios.get(`http://localhost:5000/author/${author}`)
+    res.send(response.data);
+  }
+  catch(error)
+  {
+    res.status(500).send('Error fetching author')
+  }
+})
 
 // Get book details based on author
 public_users.get("/author/:author", function (req, res) {
@@ -79,6 +120,20 @@ public_users.get("/author/:author", function (req, res) {
 
   // return res.status(300).json({message: "Yet to be implemented"});
 });
+
+
+public_users.get("/async/title/:title" , async(req,res) =>
+{
+  const title = req.params.title;
+  try{
+    const response = axios.get(`http://localhost:5000/title/${title}`) ;
+    res.send(response.data);
+  }
+  catch(err)
+  {
+    res.status(500).send('Error fetching book by title')
+  }
+})
 
 // Get all books based on title
 public_users.get("/title/:title", function (req, res) {
