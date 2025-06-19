@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 let books = require("./booksdb.js");
+const e = require("express");
 const regd_users = express.Router();
 
 let users = [];
@@ -46,7 +47,7 @@ regd_users.post("/login", (req, res) => {
         data: password
       },
       'access',
-      { expiresIn: 60 }
+      { expiresIn: 60*60 }
     );
 
     req.session.authorization = { 
@@ -64,9 +65,33 @@ regd_users.post("/login", (req, res) => {
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
-});
 
+  const isbn = req.params.isbn
+  const review = req.query.review
+
+  if(!books[isbn])
+  {
+    return res.status(404).json({message:'Book not found'})
+  }
+  const username = req.session.authorization.username;
+
+  const alreadyReviewed = books[isbn].reviews.hasOwnProperty(username)
+
+  books[isbn].reviews[username] = review;
+
+  if(alreadyReviewed)
+  { 
+    return res.status(200).json({message: 'Review updated'})
+  }
+  else
+  {
+    return res.status(200).json({message: 'Review Added'})
+  }
+
+
+  // return res.status(300).json({ message: "Yet to be implemented" });
+});
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
+
